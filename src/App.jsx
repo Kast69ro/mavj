@@ -70,12 +70,13 @@ const RULES = [
 ];
 
 /* ─────────────────────────────────────────
-   SVG DEVICES
+   SVG DEVICES — без фиксированных width/height,
+   тянутся через CSS
 ───────────────────────────────────────── */
 function WatchSVG() {
   return (
-    <svg width="130" height="210" viewBox="0 0 130 210"
-      className="block mx-auto transition-transform duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:-translate-y-2.5"
+    <svg viewBox="0 0 130 210"
+      className="block mx-auto w-[90px] sm:w-[110px] md:w-[130px] transition-transform duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:-translate-y-2.5"
       style={{ filter: "drop-shadow(0 30px 60px rgba(0,0,0,0.14))" }}>
       <rect x="48" y="4" width="34" height="10" rx="3.5" fill="#aeaeb2" />
       <rect x="48" y="196" width="34" height="10" rx="3.5" fill="#aeaeb2" />
@@ -99,8 +100,8 @@ function WatchSVG() {
 
 function IPhoneSVG() {
   return (
-    <svg width="190" height="380" viewBox="0 0 190 380"
-      className="block mx-auto transition-transform duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:-translate-y-2.5"
+    <svg viewBox="0 0 190 380"
+      className="block mx-auto w-[140px] sm:w-[165px] md:w-[190px] transition-transform duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:-translate-y-2.5"
       style={{ filter: "drop-shadow(0 30px 60px rgba(0,0,0,0.14))" }}>
       <rect x="5" y="3" width="180" height="374" rx="46" fill="#2c2c2e" />
       <rect x="7" y="5" width="176" height="370" rx="44" fill="#1c1c1e" />
@@ -145,8 +146,8 @@ function IPhoneSVG() {
 
 function AirPodsSVG() {
   return (
-    <svg width="120" height="200" viewBox="0 0 120 200"
-      className="block mx-auto transition-transform duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:-translate-y-2.5"
+    <svg viewBox="0 0 120 200"
+      className="block mx-auto w-[80px] sm:w-[100px] md:w-[120px] transition-transform duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:-translate-y-2.5"
       style={{ filter: "drop-shadow(0 30px 60px rgba(0,0,0,0.14))" }}>
       <rect x="16" y="38" width="88" height="140" rx="22" fill="#e8e8ea" />
       <rect x="18" y="40" width="84" height="136" rx="20" fill="#f5f5f7" />
@@ -167,7 +168,7 @@ function AirPodsSVG() {
 }
 
 /* ─────────────────────────────────────────
-   CONTACT FIELD — styled to match dark sections
+   CONTACT FIELD
 ───────────────────────────────────────── */
 function ContactField({ label, name, type = "text", value, onChange, multiline }) {
   return (
@@ -205,6 +206,7 @@ export default function SMSQuiz() {
   const [fillWidth, setFillWidth] = useState(0);
   const [form, setForm] = useState({ name: "", phone: "", email: "", message: "" });
   const [sent, setSent] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
@@ -231,6 +233,11 @@ export default function SMSQuiz() {
     setForm({ name: "", phone: "", email: "", message: "" });
   };
 
+  const scrollTo = (href) => {
+    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    setMenuOpen(false);
+  };
+
   const currentYear = new Date().getFullYear();
 
   return (
@@ -240,65 +247,103 @@ export default function SMSQuiz() {
         html { scroll-behavior: smooth; }
         @keyframes au    { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
         @keyframes popIn { from { opacity:0; transform:scale(.97); }      to { opacity:1; transform:scale(1); } }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:none; } }
         .anim-0   { animation: au .7s ease both; }
         .anim-1   { animation: au .7s .1s ease both; }
         .anim-2   { animation: au .7s .2s ease both; }
         .anim-3   { animation: au .7s .3s ease both; }
         .anim-4   { animation: au .7s .4s ease both; }
         .anim-pop { animation: popIn .25s ease both; }
+        .anim-slide { animation: slideDown .2s ease both; }
         .rf-bar   { transition: width 1s cubic-bezier(.4,0,.2,1); }
       `}</style>
 
       {/* ── NAV ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 h-12 px-5 flex items-center justify-between border-b border-black/[0.08] bg-white/[0.82] backdrop-saturate-[180%] backdrop-blur-xl">
-        <span className="text-[1.1rem] font-bold tracking-tight">Mavj Quiz</span>
-        <ul className="hidden md:flex list-none gap-0">
-          {NAV_LINKS.map(({ href, label }) => (
-            <li key={href}>
-              <a href={href}
-                onClick={(e) => { e.preventDefault(); document.querySelector(href)?.scrollIntoView({ behavior: "smooth" }); }}
-                className="text-[#6e6e73] hover:text-[#1d1d1f] no-underline text-[0.8rem] px-3 h-12 flex items-center transition-colors duration-150 cursor-pointer">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-black/[0.08] bg-white/[0.82] backdrop-saturate-[180%] backdrop-blur-xl">
+        <div className="h-12 px-5 flex items-center justify-between">
+          <span className="text-[1.1rem] font-bold tracking-tight">Mavj Quiz</span>
+
+          {/* Desktop nav */}
+          <ul className="hidden md:flex list-none gap-0">
+            {NAV_LINKS.map(({ href, label }) => (
+              <li key={href}>
+                <a href={href}
+                  onClick={(e) => { e.preventDefault(); scrollTo(href); }}
+                  className="text-[#6e6e73] hover:text-[#1d1d1f] no-underline text-[0.8rem] px-3 h-12 flex items-center transition-colors duration-150 cursor-pointer">
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+
+          {/* Burger button — mobile only */}
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            className="md:hidden flex flex-col justify-center items-center w-8 h-8 gap-[5px] bg-transparent border-none cursor-pointer p-0"
+            aria-label="Меню"
+          >
+            <span className={`block w-5 h-[1.5px] bg-[#1d1d1f] transition-all duration-200 origin-center ${menuOpen ? "rotate-45 translate-y-[6.5px]" : ""}`} />
+            <span className={`block w-5 h-[1.5px] bg-[#1d1d1f] transition-all duration-200 ${menuOpen ? "opacity-0" : ""}`} />
+            <span className={`block w-5 h-[1.5px] bg-[#1d1d1f] transition-all duration-200 origin-center ${menuOpen ? "-rotate-45 -translate-y-[6.5px]" : ""}`} />
+          </button>
+        </div>
+
+        {/* Mobile dropdown */}
+        {menuOpen && (
+          <div className="anim-slide md:hidden border-t border-black/[0.06] bg-white/[0.96] backdrop-blur-xl px-5 pb-3">
+            {NAV_LINKS.map(({ href, label }) => (
+              <button
+                key={href}
+                onClick={() => scrollTo(href)}
+                className="w-full text-left py-3 text-[0.9rem] font-medium text-[#1d1d1f] border-b border-black/[0.05] last:border-none bg-transparent border-x-0 border-t-0 cursor-pointer"
+                style={{ fontFamily: "inherit" }}
+              >
                 {label}
-              </a>
-            </li>
-          ))}
-        </ul>
-        <div></div>
+              </button>
+            ))}
+          </div>
+        )}
       </nav>
 
       {/* ── HERO ── */}
-      <section className="text-center px-[5%] pt-[148px] bg-white overflow-hidden">
+      <section className="text-center px-[5%] pt-[100px] md:pt-[148px] bg-white overflow-hidden">
         <p className="anim-0 text-[0.72rem] font-semibold tracking-[0.08em] uppercase text-[#0071e3] mb-3">
           Mavj Quiz · Таджикистан · Апрель 2026
         </p>
-        <h1 className="anim-1 font-extrabold tracking-[-0.045em] leading-[1.02] mb-4" style={{ fontSize: "clamp(3rem,7vw,5.5rem)" }}>
+        <h1 className="anim-1 font-extrabold tracking-[-0.045em] leading-[1.02] mb-4" style={{ fontSize: "clamp(2.6rem,7vw,5.5rem)" }}>
           Отвечай.<br />Побеждай.
         </h1>
-        <p className="anim-2 font-light text-[#6e6e73] max-w-[520px] mx-auto mb-9 leading-[1.5]" style={{ fontSize: "clamp(1rem,2.5vw,1.35rem)" }}>
+        <p className="anim-2 font-light text-[#6e6e73] max-w-[520px] mx-auto mb-8 leading-[1.5]" style={{ fontSize: "clamp(0.95rem,2.5vw,1.35rem)" }}>
           Ежедневные вопросы по SMS. Набирай баллы и выигрывай Apple каждый месяц.
         </p>
-        <div className="anim-3 flex gap-3.5 justify-center flex-wrap mb-[72px]">
+        <div className="anim-3 flex gap-3 justify-center flex-wrap mb-12 md:mb-[72px]">
           <a href="tel:*3033*1%23"
-            className="bg-[#0071e3] hover:bg-[#0077ed] hover:scale-[1.02] text-white no-underline rounded-full px-6 py-[13px] text-base font-semibold inline-flex items-center gap-1.5 transition-all duration-200">
+            className="bg-[#0071e3] hover:bg-[#0077ed] hover:scale-[1.02] text-white no-underline rounded-full px-5 py-3 md:px-6 md:py-[13px] text-sm md:text-base font-semibold inline-flex items-center gap-1.5 transition-all duration-200">
             Участвовать
           </a>
           <a href="#how"
-            className="bg-transparent text-[#0071e3] border border-[rgba(0,113,227,0.35)] hover:border-[#0071e3] rounded-full px-6 py-[13px] text-base font-semibold no-underline transition-all duration-200">
+            onClick={(e) => { e.preventDefault(); scrollTo("#how"); }}
+            className="bg-transparent text-[#0071e3] border border-[rgba(0,113,227,0.35)] hover:border-[#0071e3] rounded-full px-5 py-3 md:px-6 md:py-[13px] text-sm md:text-base font-semibold no-underline transition-all duration-200 cursor-pointer">
             Как участвовать
           </a>
         </div>
-        <div className="anim-4 flex justify-center items-end gap-8">
-          <div className="group text-center">
-            <WatchSVG />
-            <p className="text-[0.88rem] font-semibold tracking-[-0.01em] mt-3.5 mb-0.5">Apple Watch Series 11</p>
-            <p className="text-[0.75rem] text-[#86868b]">2-е место</p>
-          </div>
-          <div className="group text-center">
+
+        {/* Devices — горизонтально на десктопе, вертикально на мобиле */}
+        <div className="anim-4 flex flex-col items-center gap-8 md:flex-row md:justify-center md:items-end md:gap-8 pb-12 md:pb-0">
+          {/* iPhone — на мобиле первый (главный приз) */}
+          <div className="group text-center order-1 md:order-2">
             <IPhoneSVG />
             <p className="text-[0.88rem] font-semibold tracking-[-0.01em] mt-3.5 mb-0.5">iPhone 17 Pro Max</p>
             <p className="text-[0.75rem] text-[#86868b]">1-е место</p>
           </div>
-          <div className="group text-center">
+          {/* Watch */}
+          <div className="group text-center order-2 md:order-1">
+            <WatchSVG />
+            <p className="text-[0.88rem] font-semibold tracking-[-0.01em] mt-3.5 mb-0.5">Apple Watch Series 11</p>
+            <p className="text-[0.75rem] text-[#86868b]">2-е место</p>
+          </div>
+          {/* AirPods */}
+          <div className="group text-center order-3">
             <AirPodsSVG />
             <p className="text-[0.88rem] font-semibold tracking-[-0.01em] mt-3.5 mb-0.5">AirPods 4 Active Noise</p>
             <p className="text-[0.75rem] text-[#86868b]">3-е место</p>
@@ -307,30 +352,35 @@ export default function SMSQuiz() {
       </section>
 
       {/* ── STATS BAR ── */}
-      <div className="bg-[#f5f5f7] border-t border-b border-black/[0.08] flex justify-center">
+      {/* 2 колонки на мобиле, 4 — на десктопе */}
+      <div className="bg-[#f5f5f7] border-t border-b border-black/[0.08] grid grid-cols-2 md:flex md:justify-center">
         {STATS.map(({ value, label }, i) => (
-          <div key={label} className={`flex-1 max-w-[220px] py-7 px-5 text-center ${i < STATS.length - 1 ? "border-r border-black/[0.08]" : ""}`}>
-            <p className="text-[2rem] font-bold tracking-[-0.03em] leading-none">{value}</p>
-            <p className="text-[0.78rem] text-[#86868b] mt-1">{label}</p>
+          <div key={label} className={`py-6 md:py-7 px-4 md:px-5 text-center md:flex-1 md:max-w-[220px] border-black/[0.08]
+            ${i % 2 === 0 ? "border-r" : ""}
+            ${i < 2 ? "border-b md:border-b-0" : ""}
+            ${i < STATS.length - 1 ? "md:border-r" : ""}
+          `}>
+            <p className="text-[1.7rem] md:text-[2rem] font-bold tracking-[-0.03em] leading-none">{value}</p>
+            <p className="text-[0.75rem] md:text-[0.78rem] text-[#86868b] mt-1">{label}</p>
           </div>
         ))}
       </div>
 
       {/* ── CHECK ── */}
-      <section id="check" className="py-20 px-[5%] text-center">
+      <section id="check" className="py-14 md:py-20 px-[5%] text-center">
         <p className="text-[0.72rem] font-semibold tracking-[0.08em] uppercase text-[#0071e3] mb-2.5">Личный кабинет</p>
-        <h2 className="font-bold tracking-[-0.03em] leading-[1.08] mb-3" style={{ fontSize: "clamp(2rem,4.5vw,3rem)" }}>Ваши баллы</h2>
-        <p className="text-[0.95rem] text-[#6e6e73] max-w-[460px] mx-auto mb-12 leading-[1.6] font-light">
+        <h2 className="font-bold tracking-[-0.03em] leading-[1.08] mb-3" style={{ fontSize: "clamp(1.8rem,4.5vw,3rem)" }}>Ваши баллы</h2>
+        <p className="text-[0.95rem] text-[#6e6e73] max-w-[460px] mx-auto mb-10 leading-[1.6] font-light">
           Введите номер и мгновенно узнайте результат и ближайший приз.
         </p>
-        <div className="max-w-[540px] mx-auto bg-[#f5f5f7] rounded-[20px] p-9 text-left">
+        <div className="max-w-[540px] mx-auto bg-[#f5f5f7] rounded-[20px] p-5 md:p-9 text-left">
           <p className="text-[0.8rem] font-medium text-[#6e6e73] mb-2">Номер телефона</p>
           <div className="flex">
-            <div className="bg-white border border-black/[0.12] border-r-0 rounded-l-[10px] px-3.5 py-3 text-[0.9rem] font-medium text-[#6e6e73]">+992</div>
+            <div className="bg-white border border-black/[0.12] border-r-0 rounded-l-[10px] px-3 md:px-3.5 py-3 text-[0.85rem] md:text-[0.9rem] font-medium text-[#6e6e73] shrink-0">+992</div>
             <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
               onKeyPress={(e) => { if (e.key === "Enter") handleCheck(); }}
               placeholder="90 123 45 67" maxLength={12}
-              className="flex-1 border border-black/[0.12] rounded-r-[10px] px-3.5 py-3 text-[0.9rem] font-medium bg-white outline-none focus:border-[#0071e3] focus:shadow-[0_0_0_3px_rgba(0,113,227,0.12)] placeholder:text-black/[0.22] transition-all duration-200"
+              className="flex-1 min-w-0 border border-black/[0.12] rounded-r-[10px] px-3 md:px-3.5 py-3 text-[0.85rem] md:text-[0.9rem] font-medium bg-white outline-none focus:border-[#0071e3] focus:shadow-[0_0_0_3px_rgba(0,113,227,0.12)] placeholder:text-black/[0.22] transition-all duration-200"
               style={{ fontFamily: "inherit" }} />
           </div>
           <button onClick={handleCheck}
@@ -340,12 +390,12 @@ export default function SMSQuiz() {
           </button>
           {result && (
             <div className="anim-pop mt-3.5 bg-white rounded-xl p-5 border border-black/[0.08]">
-              <p className="text-[2.8rem] font-bold tracking-[-0.04em] leading-none">{result.pts.toLocaleString("ru")}</p>
+              <p className="text-[2.4rem] md:text-[2.8rem] font-bold tracking-[-0.04em] leading-none">{result.pts.toLocaleString("ru")}</p>
               <p className="text-[0.76rem] text-[#86868b] mt-1 mb-3.5">баллов в этом месяце</p>
               <div className="h-1 bg-[#f5f5f7] rounded-full overflow-hidden mb-1.5">
                 <div className="rf-bar h-full rounded-full" style={{ width: `${fillWidth}%`, background: "linear-gradient(90deg,#0071e3,#34aadc)" }} />
               </div>
-              <div className="flex justify-between text-[0.7rem] text-[#86868b] mb-2.5">
+              <div className="flex justify-between text-[0.68rem] md:text-[0.7rem] text-[#86868b] mb-2.5">
                 <span>0</span><span>{result.pct}%</span><span>1 800 (iPhone)</span>
               </div>
               <p className="text-[0.88rem] font-semibold text-[#0071e3]">{result.status}</p>
@@ -355,19 +405,20 @@ export default function SMSQuiz() {
       </section>
 
       {/* ── PRIZES DARK ── */}
-      <section id="prizes" className="bg-[#1d1d1f] py-20 px-[5%] text-center">
+      <section id="prizes" className="bg-[#1d1d1f] py-14 md:py-20 px-[5%] text-center">
         <p className="text-[0.72rem] font-semibold tracking-[0.08em] uppercase text-[#2997ff] mb-2.5">Призы этого месяца</p>
-        <h2 className="font-bold tracking-[-0.03em] leading-[1.08] mb-3 text-white" style={{ fontSize: "clamp(2rem,4.5vw,3rem)" }}>Выиграйте Apple.</h2>
-        <p className="text-[0.95rem] text-white/55 max-w-[460px] mx-auto mb-12 leading-[1.6] font-light">
+        <h2 className="font-bold tracking-[-0.03em] leading-[1.08] mb-3 text-white" style={{ fontSize: "clamp(1.8rem,4.5vw,3rem)" }}>Выиграйте Apple.</h2>
+        <p className="text-[0.95rem] text-white/55 max-w-[460px] mx-auto mb-10 leading-[1.6] font-light">
           Три победителя каждый месяц. Если порог не набран — приз суммируется со следующим.
         </p>
-        <div className="flex gap-px max-w-[860px] mx-auto bg-white/[0.07] rounded-[18px] overflow-hidden">
+        {/* Вертикально на мобиле, горизонтально на десктопе */}
+        <div className="flex flex-col md:flex-row gap-px max-w-[860px] mx-auto bg-white/[0.07] rounded-[18px] overflow-hidden">
           {PRIZES.map((p) => (
             <div key={p.place}
-              className="flex-1 py-10 px-6 bg-white/[0.04] hover:bg-white/[0.09] text-center transition-colors duration-200 relative after:content-[''] after:absolute after:top-0 after:left-[15%] after:right-[15%] after:h-px after:bg-gradient-to-r after:from-transparent after:via-white/[0.12] after:to-transparent">
-              <p className="text-[0.62rem] font-bold tracking-[0.12em] uppercase text-white/35 mb-5">{p.place}</p>
-              <span className="text-[3rem] block mb-4">{p.icon}</span>
-              <p className="text-base font-semibold text-white leading-[1.3] mb-3.5 whitespace-pre-line">{p.name}</p>
+              className="flex-1 py-8 md:py-10 px-6 bg-white/[0.04] hover:bg-white/[0.09] text-center transition-colors duration-200 relative after:content-[''] after:absolute after:top-0 after:left-[15%] after:right-[15%] after:h-px after:bg-gradient-to-r after:from-transparent after:via-white/[0.12] after:to-transparent">
+              <p className="text-[0.62rem] font-bold tracking-[0.12em] uppercase text-white/35 mb-4 md:mb-5">{p.place}</p>
+              <span className="text-[2.5rem] md:text-[3rem] block mb-3 md:mb-4">{p.icon}</span>
+              <p className="text-base font-semibold text-white leading-[1.3] mb-3 md:mb-3.5 whitespace-pre-line">{p.name}</p>
               <span className="inline-block bg-white/[0.07] border border-white/[0.1] rounded-full px-3 py-1 text-[0.74rem] text-white/50">{p.pts}</span>
             </div>
           ))}
@@ -375,32 +426,38 @@ export default function SMSQuiz() {
       </section>
 
       {/* ── HOW ── */}
-      <section id="how" className="py-20 px-[5%] text-center bg-[#f5f5f7]">
+      <section id="how" className="py-14 md:py-20 px-[5%] text-center bg-[#f5f5f7]">
         <p className="text-[0.72rem] font-semibold tracking-[0.08em] uppercase text-[#0071e3] mb-2.5">Участие</p>
-        <h2 className="font-bold tracking-[-0.03em] leading-[1.08] mb-12" style={{ fontSize: "clamp(2rem,4.5vw,3rem)" }}>Просто. Каждый день.</h2>
-        <div className="grid grid-cols-4 border border-black/[0.08] rounded-[18px] overflow-hidden bg-white max-w-[960px] mx-auto">
+        <h2 className="font-bold tracking-[-0.03em] leading-[1.08] mb-10 md:mb-12" style={{ fontSize: "clamp(1.8rem,4.5vw,3rem)" }}>Просто. Каждый день.</h2>
+        {/* 2 колонки на мобиле, 4 — на десктопе */}
+        <div className="grid grid-cols-2 md:grid-cols-4 border border-black/[0.08] rounded-[18px] overflow-hidden bg-white max-w-[960px] mx-auto">
           {HOW_STEPS.map((h, i) => (
-            <div key={h.n} className={`py-8 px-5 text-center hover:bg-[#f5f5f7] transition-colors duration-150 ${i < HOW_STEPS.length - 1 ? "border-r border-black/[0.08]" : ""}`}>
-              <p className="text-[0.62rem] font-semibold tracking-[0.1em] uppercase text-[#86868b] mb-3.5">{h.n}</p>
-              <p className="text-[2rem] mb-3">{h.icon}</p>
-              <p className="text-[0.9rem] font-semibold mb-1.5">{h.title}</p>
-              <p className="text-[0.78rem] text-[#86868b] leading-[1.55] font-light">{h.desc}</p>
+            <div key={h.n} className={`py-7 md:py-8 px-4 md:px-5 text-center hover:bg-[#f5f5f7] transition-colors duration-150
+              ${i % 2 === 0 ? "border-r border-black/[0.08]" : ""}
+              ${i < 2 ? "border-b border-black/[0.08] md:border-b-0" : ""}
+              ${i < HOW_STEPS.length - 1 ? "md:border-r md:border-black/[0.08]" : ""}
+            `}>
+              <p className="text-[0.62rem] font-semibold tracking-[0.1em] uppercase text-[#86868b] mb-3">{h.n}</p>
+              <p className="text-[1.8rem] md:text-[2rem] mb-2.5 md:mb-3">{h.icon}</p>
+              <p className="text-[0.85rem] md:text-[0.9rem] font-semibold mb-1.5">{h.title}</p>
+              <p className="text-[0.75rem] md:text-[0.78rem] text-[#86868b] leading-[1.55] font-light">{h.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── WINNERS ── */}
-      <section id="winners" className="py-20 px-[5%] text-center">
+      <section id="winners" className="py-14 md:py-20 px-[5%] text-center">
         <p className="text-[0.72rem] font-semibold tracking-[0.08em] uppercase text-[#0071e3] mb-2.5">Зал победителей</p>
-        <h2 className="font-bold tracking-[-0.03em] leading-[1.08] mb-3" style={{ fontSize: "clamp(2rem,4.5vw,3rem)" }}>Победители месяца</h2>
-        <p className="text-[0.95rem] text-[#6e6e73] max-w-[460px] mx-auto mb-12 leading-[1.6] font-light">
+        <h2 className="font-bold tracking-[-0.03em] leading-[1.08] mb-3" style={{ fontSize: "clamp(1.8rem,4.5vw,3rem)" }}>Победители месяца</h2>
+        <p className="text-[0.95rem] text-[#6e6e73] max-w-[460px] mx-auto mb-10 leading-[1.6] font-light">
           Апрель 2026 · Номера скрыты из соображений приватности.
         </p>
-        <div className="flex gap-3.5 justify-center flex-wrap">
+        {/* Вертикально на мобиле, горизонтально на десктопе */}
+        <div className="flex flex-col items-center gap-3 md:flex-row md:flex-wrap md:justify-center md:gap-3.5">
           {WINNERS.map((w) => (
             <div key={w.phone}
-              className={`rounded-[18px] p-8 w-[220px] text-center transition-all duration-200 border border-transparent ${w.dark ? "bg-[#1d1d1f] hover:border-white/10" : "bg-[#f5f5f7] hover:bg-white hover:border-black/[0.08] hover:shadow-[0_8px_32px_rgba(0,0,0,0.06)] hover:-translate-y-1"}`}>
+              className={`rounded-[18px] p-7 md:p-8 w-full max-w-[320px] md:w-[220px] text-center transition-all duration-200 border border-transparent ${w.dark ? "bg-[#1d1d1f] hover:border-white/10" : "bg-[#f5f5f7] hover:bg-white hover:border-black/[0.08] hover:shadow-[0_8px_32px_rgba(0,0,0,0.06)] hover:-translate-y-1"}`}>
               <p className="text-[2rem] mb-3">{w.medal}</p>
               <p className={`text-[0.92rem] font-semibold tracking-[0.02em] mb-0.5 ${w.dark ? "text-white" : "text-[#1d1d1f]"}`}>{w.phone}</p>
               <p className={`text-[0.78rem] mb-2.5 ${w.dark ? "text-white/40" : "text-[#86868b]"}`}>{w.pts}</p>
@@ -413,18 +470,19 @@ export default function SMSQuiz() {
       </section>
 
       {/* ── TARIFF DARK ── */}
-      <section id="tariff" className="bg-[#1d1d1f] py-20 px-[5%] text-center">
+      <section id="tariff" className="bg-[#1d1d1f] py-14 md:py-20 px-[5%] text-center">
         <p className="text-[0.72rem] font-semibold tracking-[0.08em] uppercase text-[#2997ff] mb-2.5">Тарифы</p>
-        <h2 className="font-bold tracking-[-0.03em] leading-[1.08] mb-3 text-white" style={{ fontSize: "clamp(2rem,4.5vw,3rem)" }}>Прозрачные цены.</h2>
-        <p className="text-[0.95rem] text-white/55 max-w-[460px] mx-auto mb-12 leading-[1.6] font-light">
+        <h2 className="font-bold tracking-[-0.03em] leading-[1.08] mb-3 text-white" style={{ fontSize: "clamp(1.8rem,4.5vw,3rem)" }}>Прозрачные цены.</h2>
+        <p className="text-[0.95rem] text-white/55 max-w-[460px] mx-auto mb-10 leading-[1.6] font-light">
           Никаких скрытых платежей. Доп. пакет — только с вашего согласия.
         </p>
-        <div className="flex gap-3.5 justify-center flex-wrap">
+        {/* Вертикально на мобиле, горизонтально на десктопе */}
+        <div className="flex flex-col items-center gap-3 md:flex-row md:flex-wrap md:justify-center md:gap-3.5">
           {TARIFFS.map((tc) => (
             <div key={tc.tag}
-              className={`rounded-[18px] p-8 w-[260px] text-left transition-colors duration-200 ${tc.light ? "bg-white border border-transparent hover:bg-[#f9f9fb]" : "bg-white/[0.05] border border-white/10 hover:bg-white/[0.09]"}`}>
+              className={`rounded-[18px] p-7 md:p-8 w-full max-w-[360px] md:w-[260px] text-left transition-colors duration-200 ${tc.light ? "bg-white border border-transparent hover:bg-[#f9f9fb]" : "bg-white/[0.05] border border-white/10 hover:bg-white/[0.09]"}`}>
               <p className={`text-[0.67rem] font-semibold tracking-[0.08em] uppercase mb-3 ${tc.light ? "text-[#86868b]" : "text-white/35"}`}>{tc.tag}</p>
-              <p className={`text-[2.6rem] font-bold tracking-[-0.04em] leading-none mb-0.5 ${tc.light ? "text-[#0071e3]" : "text-[#2997ff]"}`}>{tc.price}</p>
+              <p className={`text-[2.4rem] md:text-[2.6rem] font-bold tracking-[-0.04em] leading-none mb-0.5 ${tc.light ? "text-[#0071e3]" : "text-[#2997ff]"}`}>{tc.price}</p>
               <p className={`text-[0.8rem] mb-5 ${tc.light ? "text-[#86868b]" : "text-white/35"}`}>{tc.per}</p>
               <div className={`h-px mb-4 ${tc.light ? "bg-black/[0.08]" : "bg-white/[0.07]"}`} />
               <ul className="list-none flex flex-col gap-2.5">
@@ -440,20 +498,21 @@ export default function SMSQuiz() {
       </section>
 
       {/* ── RULES ── */}
-      <section id="rules" className="py-20 px-[5%] text-center bg-[#f5f5f7]">
+      <section id="rules" className="py-14 md:py-20 px-[5%] text-center bg-[#f5f5f7]">
         <p className="text-[0.72rem] font-semibold tracking-[0.08em] uppercase text-[#0071e3] mb-2.5">Правила</p>
-        <h2 className="font-bold tracking-[-0.03em] leading-[1.08] mb-12" style={{ fontSize: "clamp(2rem,4.5vw,3rem)" }}>Условия участия</h2>
-        <div className="grid grid-cols-3 gap-3.5 max-w-[820px] mx-auto">
+        <h2 className="font-bold tracking-[-0.03em] leading-[1.08] mb-10 md:mb-12" style={{ fontSize: "clamp(1.8rem,4.5vw,3rem)" }}>Условия участия</h2>
+        {/* 1 колонка на мобиле, 2 на sm, 3 на md */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-3.5 max-w-[820px] mx-auto">
           {RULES.map((r) => (
             <div key={r.title}
-              className="bg-white border border-black/[0.08] rounded-[14px] p-6 text-left transition-all duration-200 hover:shadow-[0_8px_28px_rgba(0,0,0,0.05)] hover:-translate-y-0.5">
+              className="bg-white border border-black/[0.08] rounded-[14px] p-5 md:p-6 text-left transition-all duration-200 hover:shadow-[0_8px_28px_rgba(0,0,0,0.05)] hover:-translate-y-0.5">
               <p className="text-[1.4rem] mb-2.5">{r.icon}</p>
               <p className="text-[0.88rem] font-semibold mb-1.5">{r.title}</p>
               <p className="text-[0.78rem] text-[#86868b] leading-[1.55] font-light">{r.desc}</p>
             </div>
           ))}
         </div>
-        <div className="mt-10">
+        <div className="mt-8 md:mt-10">
           <a href="#"
             className="inline-flex items-center gap-2 bg-[#0071e3] hover:bg-[#0077ed] active:bg-[#006edb] text-white text-[0.88rem] font-medium px-7 py-3 rounded-full transition-all duration-200 hover:shadow-[0_4px_16px_rgba(0,113,227,0.35)] hover:-translate-y-0.5">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
@@ -464,25 +523,23 @@ export default function SMSQuiz() {
         </div>
       </section>
 
-      {/* ── CONTACT — единый стиль с тёмными секциями ── */}
-      <section id="contact" className="bg-[#1d1d1f] py-20 px-[5%]">
+      {/* ── CONTACT ── */}
+      <section id="contact" className="bg-[#1d1d1f] py-14 md:py-20 px-[5%]">
         <div className="max-w-[960px] mx-auto">
-          {/* Header */}
-          <div className="text-center mb-14">
+          <div className="text-center mb-10 md:mb-14">
             <p className="text-[0.72rem] font-semibold tracking-[0.08em] uppercase text-[#2997ff] mb-2.5">Связь</p>
-            <h2 className="font-bold tracking-[-0.03em] leading-[1.08] text-white" style={{ fontSize: "clamp(2rem,4.5vw,3rem)" }}>
+            <h2 className="font-bold tracking-[-0.03em] leading-[1.08] text-white" style={{ fontSize: "clamp(1.8rem,4.5vw,3rem)" }}>
               Свяжитесь с нами.
             </h2>
           </div>
 
-          {/* Grid */}
-          <div className="grid gap-px bg-white/[0.07] rounded-[18px] overflow-hidden"
-            style={{ gridTemplateColumns: "1fr 1fr 1.4fr" }}>
+          {/* 1 колонка на мобиле, 3 колонки на десктопе */}
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1.4fr] gap-px bg-white/[0.07] rounded-[18px] overflow-hidden">
 
             {/* Col 1: Адрес */}
-            <div className="bg-white/[0.04] hover:bg-white/[0.07] transition-colors duration-200 p-8">
-              <p className="text-[0.62rem] font-bold tracking-[0.12em] uppercase text-white/35 mb-6">Адрес</p>
-              <div className="flex flex-col gap-5">
+            <div className="bg-white/[0.04] hover:bg-white/[0.07] transition-colors duration-200 p-7 md:p-8">
+              <p className="text-[0.62rem] font-bold tracking-[0.12em] uppercase text-white/35 mb-5 md:mb-6">Адрес</p>
+              <div className="flex flex-col gap-4 md:gap-5">
                 <a href="#" className="flex items-start gap-3 text-white/70 hover:text-white transition-colors duration-150 no-underline group">
                   <span className="mt-0.5 text-[#0071e3] shrink-0">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -497,7 +554,7 @@ export default function SMSQuiz() {
                       <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.6 17.6 0 0 0 4.168 6.608 17.6 17.6 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.68.68 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.823 8.713a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328Z" fill="currentColor"/>
                     </svg>
                   </span>
-                  <span className="text-[0.85rem]">+992 117 111 111</span>
+                  <span className="text-[0.85rem]">+992 115 553 033</span>
                 </a>
                 <a href="mailto:mavjivase@gmail.com" className="flex items-center gap-3 text-white/70 hover:text-white transition-colors duration-150 no-underline">
                   <span className="text-[#0071e3] shrink-0">
@@ -510,9 +567,9 @@ export default function SMSQuiz() {
               </div>
             </div>
 
-            {/* Col 2: О нас */}
-            <div className="bg-white/[0.04] hover:bg-white/[0.07] transition-colors duration-200 p-8">
-              <p className="text-[0.62rem] font-bold tracking-[0.12em] uppercase text-white/35 mb-6">Контакты</p>
+            {/* Col 2: Контакты */}
+            <div className="bg-white/[0.04] hover:bg-white/[0.07] transition-colors duration-200 p-7 md:p-8">
+              <p className="text-[0.62rem] font-bold tracking-[0.12em] uppercase text-white/35 mb-5 md:mb-6">Контакты</p>
               <p className="text-[0.85rem] text-white/60 leading-[1.7] mb-4">
                 Для получения подробной информации свяжитесь с нами — выберите удобный способ.
               </p>
@@ -522,10 +579,10 @@ export default function SMSQuiz() {
             </div>
 
             {/* Col 3: Форма */}
-            <div className="bg-white/[0.04] hover:bg-white/[0.07] transition-colors duration-200 p-8">
-              <p className="text-[0.62rem] font-bold tracking-[0.12em] uppercase text-white/35 mb-6">Написать нам</p>
+            <div className="bg-white/[0.04] hover:bg-white/[0.07] transition-colors duration-200 p-7 md:p-8">
+              <p className="text-[0.62rem] font-bold tracking-[0.12em] uppercase text-white/35 mb-5 md:mb-6">Написать нам</p>
               {sent ? (
-                <div className="anim-pop flex flex-col items-center justify-center h-[280px] gap-3">
+                <div className="anim-pop flex flex-col items-center justify-center h-[240px] md:h-[280px] gap-3">
                   <span className="text-[2.5rem]">✅</span>
                   <p className="text-white font-semibold text-[0.95rem]">Сообщение отправлено!</p>
                   <p className="text-white/40 text-[0.8rem]">Мы свяжемся с вами в ближайшее время.</p>
